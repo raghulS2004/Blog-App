@@ -17,6 +17,7 @@ const MONGO_URI = process.env.SESSION_DB_URI;
 
 console.log("🔌 Connecting to DB:", MONGO_URI);
 
+// Connect to MongoDB
 mongoose.connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB connection successful"))
   .catch((err) => {
@@ -24,10 +25,17 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
+// ✅ Updated CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://blog-frontend.vercel.app' // 🔁 Replace with your actual Vercel frontend URL
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: allowedOrigins,
   credentials: true
 }));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -38,14 +46,14 @@ app.use(session({
   store: MongoStore.create({
     mongoUrl: MONGO_URI,
     collectionName: "sessions",
-    ttl: 14 * 24 * 60 * 60 // 14 days
+    ttl: 14 * 24 * 60 * 60
   })
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Mongoose Schemas
+// Schemas
 const userSchema = new mongoose.Schema({
   name: String,
   username: String,
@@ -69,32 +77,28 @@ userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model("User", userSchema);
 const Text = mongoose.model("Text", textSchema);
 
-// Passport Configuration
+// Passport Config
 passport.use(new LocalStrategy(User.authenticate()));
-
 passport.serializeUser((user, done) => {
   console.log("✅ Serializing user:", user._id);
   done(null, user._id);
 });
-
 passport.deserializeUser((id, done) => {
   console.log("🔍 Deserializing user by ID:", id);
   if (!mongoose.Types.ObjectId.isValid(id)) {
     console.error("❌ Invalid ObjectId during deserialization:", id);
     return done(null, false);
   }
-
   User.findById(id)
     .then(user => done(null, user))
     .catch(err => done(err));
 });
 
-// Debug session endpoint (optional)
+// Routes
 app.get("/session-debug", (req, res) => {
   res.json(req.session);
 });
 
-// Routes
 app.get("/current_user", (req, res) => {
   res.json({ user: req.isAuthenticated() ? req.user : null });
 });
@@ -210,12 +214,12 @@ app.delete("/posts/:id", async (req, res) => {
   }
 });
 
-// Start the server
+// Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 }).on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.error(`❌ Port ${PORT} is already in use. Try another port or stop the running process.`);
+    console.error(`❌ Port ${PORT} is already in use.`);
     process.exit(1);
   } else {
     console.error('❌ Server failed to start:', err);
