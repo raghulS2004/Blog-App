@@ -1,0 +1,312 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+h1{
+    text-align: center;
+    color: #921A40;
+    font-size: 2.5rem;
+    font-family: "Bebas Neue",sans-serif;
+}
+p{
+    font-family: "Edu VIC WA NT Beginner", cursive;
+    font-size: 1.7rem;
+}
+.content-box{
+    margin: 10vh 2vw;
+}
+@media screen and (max-width:576px) {
+    .content-box{
+        margin: 5vh 7vw;
+    }
+}
+
+.about-section {
+    width: 100%;
+    background: var(--primary-bg, #CCD5AE);
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+.about-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(67,104,80,0.10), 0 1.5px 4px rgba(146,26,64,0.04);
+    padding: 2.5rem 2rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    font-family: 'Poppins', 'Inter', Arial, sans-serif;
+    animation: fadeInUp 0.7s ease-out;
+}
+.about-heading {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #921A40;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.about-main {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    width: 100%;
+    justify-content: center;
+}
+.about-profile-img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #86AB89;
+    box-shadow: 0 2px 8px rgba(67,104,80,0.10);
+}
+.about-bio {
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+.about-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #436850;
+    margin-bottom: 0.2rem;
+}
+.about-tagline {
+    font-size: 1.1rem;
+    color: #921A40;
+    font-style: italic;
+    margin-bottom: 0.7rem;
+}
+.about-highlights {
+    width: 100%;
+    margin-top: 2rem;
+}
+.about-subheading {
+    font-size: 1.3rem;
+    color: #921A40;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+}
+.about-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #436850;
+    font-size: 1.05rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.about-timeline li {
+    position: relative;
+    padding-left: 2.2em;
+}
+.about-timeline li span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #921A40;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+.about-socials {
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+}
+.about-link {
+    color: #921A40;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: color 0.2s;
+    border-bottom: 1.5px solid #86AB89;
+    padding-bottom: 2px;
+}
+.about-link:hover {
+    color: #436850;
+    border-bottom: 1.5px solid #921A40;
+}
+@media screen and (max-width: 900px) {
+    .about-container {
+        padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+        border-radius: 10px;
+        gap: 1.2rem;
+    }
+    .about-main {
+        gap: 1.2rem;
+    }
+}
+@media screen and (max-width: 700px) {
+    .about-main {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
+    }
+    .about-profile-img {
+        width: 100px;
+        height: 100px;
+    }
+    .about-heading {
+        font-size: 1.3rem;
+    }
+}
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.about-section.blog-about-bg {
+    width: 100%;
+    background: linear-gradient(135deg, #f7f7f7 60%, #CCD5AE 100%);
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 0;
+}
+.blog-about-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(67,104,80,0.10), 0 1.5px 4px rgba(146,26,64,0.04);
+    padding: 2.5rem 2rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    font-family: 'Poppins', 'Inter', Arial, sans-serif;
+    animation: fadeInUp 0.7s ease-out;
+}
+.blog-about-logo {
+    margin-bottom: 1.2rem;
+    text-align: center;
+}
+.blog-about-icon {
+    font-size: 2.7rem;
+    display: inline-block;
+    background: #86AB89;
+    border-radius: 50%;
+    padding: 0.7rem 1rem;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(67,104,80,0.10);
+}
+.about-heading {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #921A40;
+    margin-bottom: 1.2rem;
+    text-align: center;
+}
+.about-subheading {
+    font-size: 1.3rem;
+    color: #436850;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+    text-align: center;
+}
+.about-mission {
+    font-size: 1.1rem;
+    color: #921A40;
+    font-style: italic;
+    margin-bottom: 1.2rem;
+    text-align: center;
+}
+.blog-about-container p {
+    font-size: 1.05rem;
+    color: #333;
+    margin-bottom: 1.1rem;
+    line-height: 1.7;
+    text-align: center;
+}
+.about-cta {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+.about-cta-btn {
+    background: #86AB89;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 2.2rem;
+    font-size: 1.1rem;
+    font-family: 'Poppins', 'Inter', Arial, sans-serif;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(67,104,80,0.04);
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+.about-cta-btn:hover {
+    background: #CCD5AE;
+    color: #921A40;
+}
+@media screen and (max-width: 900px) {
+    .blog-about-container {
+        padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+        border-radius: 10px;
+        gap: 1.2rem;
+    }
+}
+@media screen and (max-width: 700px) {
+    .blog-about-container {
+        padding: 1rem 0.2rem 1rem 0.2rem;
+        max-width: 98vw;
+    }
+    .about-heading {
+        font-size: 1.3rem;
+    }
+    .blog-about-icon {
+        font-size: 2rem;
+        padding: 0.5rem 0.7rem;
+    }
+}
+@media screen and (max-width: 480px) {
+    .blog-about-container {
+        padding: 0.9rem 0.3rem 0.9rem 0.3rem;
+        border-radius: 7px;
+        gap: 0.8rem;
+        max-width: 100vw;
+    }
+    .about-heading {
+        font-size: 1.1rem;
+        margin-bottom: 0.7rem;
+    }
+    .about-subheading {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .about-mission {
+        font-size: 0.98rem;
+        margin-bottom: 0.7rem;
+    }
+    .blog-about-container p {
+        font-size: 0.97rem;
+        margin-bottom: 0.7rem;
+    }
+    .about-cta-btn {
+        font-size: 0.98rem;
+        padding: 0.5rem 1.2rem;
+    }
+    .blog-about-icon {
+        font-size: 1.3rem;
+        padding: 0.3rem 0.5rem;
+    }
+}
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}

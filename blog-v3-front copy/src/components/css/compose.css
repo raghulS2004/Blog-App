@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.base-container {
+    margin: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 2rem 0;
+}
+.compose-form {
+    border: 1px solid #CCD5AE;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 2rem 2rem;
+    text-align: left;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(67,104,80,0.10), 0 1.5px 4px rgba(146,26,64,0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    font-family: 'Poppins', 'Inter', Arial, sans-serif;
+    animation: fadeInUp 0.7s ease-out;
+}
+.compose-form label {
+    font-size: 1.1rem;
+    color: #921A40;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    font-family: 'Poppins', 'Inter', Arial, sans-serif;
+}
+.compose-form input[type="text"],
+.compose-form textarea {
+    width: 100%;
+    font-size: 1.08rem;
+    border-radius: 8px;
+    border: 1px solid #CCD5AE;
+    padding: 0.7rem 1rem;
+    font-family: 'Poppins', 'Inter', Arial, sans-serif;
+    margin-bottom: 0.5rem;
+    background: #f7f7f7;
+    transition: border 0.2s;
+    line-height: 1.6;
+}
+.compose-form input[type="text"]:focus,
+.compose-form textarea:focus {
+    border: 1.5px solid #86AB89;
+    outline: none;
+}
+.compose-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+.compose-form button {
+    background: #86AB89;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    width: 50%;
+    height: 2.7rem;
+    font-size: 1.13rem;
+    font-family: 'Poppins', 'Inter', Arial, sans-serif;
+    font-weight: 600;
+    margin: 1.2rem auto 0 auto;
+    display: block;
+    box-shadow: 0 1px 2px rgba(67,104,80,0.04);
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    line-height: 1.6;
+}
+.compose-form button:hover {
+    background: #CCD5AE;
+    color: #921A40;
+}
+@media screen and (max-width: 700px) {
+    .compose-form {
+        width: 98vw;
+        max-width: 98vw;
+        padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+        border-radius: 10px;
+    }
+    .base-container {
+        padding: 1rem 0;
+    }
+}
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
