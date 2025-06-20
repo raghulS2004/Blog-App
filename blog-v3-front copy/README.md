@@ -38,7 +38,7 @@ SECRET = your\_session\_secret
 PORT = 8000
 
 Frontend (.env for Vercel):
-REACT\_APP\_API\_URL = [https://your-backend-service.onrender.com](https://your-backend-service.onrender.com)
+REACT\_APP\_API\_URL = [https://blog-app-drgj.onrender.com](https://blog-app-drgj.onrender.com)
 
 How to Run Locally:
 
