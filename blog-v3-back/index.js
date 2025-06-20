@@ -9,7 +9,6 @@ const cors = require('cors');
 const MongoStore = require('connect-mongo');
 const dotenv = require('dotenv');
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -18,7 +17,6 @@ const MONGO_URI = process.env.SESSION_DB_URI;
 
 console.log("🔌 Connecting to DB:", MONGO_URI);
 
-// MongoDB Connection
 mongoose.connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB connection successful"))
   .catch((err) => {
@@ -26,10 +24,9 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
-// Middleware
 app.use(cors({
   origin: 'http://localhost:3000',
-  credentials: true,
+  credentials: true
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -42,13 +39,13 @@ app.use(session({
     mongoUrl: MONGO_URI,
     collectionName: "sessions",
     ttl: 14 * 24 * 60 * 60 // 14 days
-  }),
+  })
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Schemas
+// Mongoose Schemas
 const userSchema = new mongoose.Schema({
   name: String,
   username: String,
@@ -67,16 +64,35 @@ const textSchema = new mongoose.Schema({
   }
 });
 
-// Plugins & Models
 userSchema.plugin(passportLocalMongoose);
 
 const User = mongoose.model("User", userSchema);
 const Text = mongoose.model("Text", textSchema);
 
-// Passport Config
+// Passport Configuration
 passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+
+passport.serializeUser((user, done) => {
+  console.log("✅ Serializing user:", user._id);
+  done(null, user._id);
+});
+
+passport.deserializeUser((id, done) => {
+  console.log("🔍 Deserializing user by ID:", id);
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    console.error("❌ Invalid ObjectId during deserialization:", id);
+    return done(null, false);
+  }
+
+  User.findById(id)
+    .then(user => done(null, user))
+    .catch(err => done(err));
+});
+
+// Debug session endpoint (optional)
+app.get("/session-debug", (req, res) => {
+  res.json(req.session);
+});
 
 // Routes
 app.get("/current_user", (req, res) => {
@@ -88,7 +104,10 @@ app.post("/register", (req, res, next) => {
   const newUser = new User({ name, username, mobile });
 
   User.register(newUser, password, (err, user) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+      console.log("❌ Registration error:", err);
+      return res.status(500).json({ error: err.message });
+    }
 
     req.login(user, (err) => {
       if (err) return next(err);
@@ -97,8 +116,22 @@ app.post("/register", (req, res, next) => {
   });
 });
 
-app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.status(200).json({ user: req.user });
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) return next(err);
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+
+    req.login(user, (err) => {
+      if (err) return next(err);
+      req.session.regenerate((err) => {
+        if (err) return next(err);
+        req.session.save((err) => {
+          if (err) return next(err);
+          res.status(200).json({ user });
+        });
+      });
+    });
+  })(req, res, next);
 });
 
 app.get("/logout", (req, res, next) => {
@@ -177,7 +210,7 @@ app.delete("/posts/:id", async (req, res) => {
   }
 });
 
-// Start server with error handling
+// Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 }).on('error', (err) => {
