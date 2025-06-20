@@ -25,14 +25,21 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
-// ✅ Updated CORS configuration
+// ✅ Correct CORS for deployed frontend
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://blog-frontend.vercel.app' // 🔁 Replace with your actual Vercel frontend URL
+  'https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app'
 ];
 
+
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('❌ Not allowed by CORS: ' + origin));
+    }
+  },
   credentials: true
 }));
 
@@ -45,7 +52,7 @@ app.use(session({
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: MONGO_URI,
-    collectionName: "sessions",
+    collectionName: 'sessions',
     ttl: 14 * 24 * 60 * 60
   })
 }));
@@ -77,12 +84,14 @@ userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model("User", userSchema);
 const Text = mongoose.model("Text", textSchema);
 
-// Passport Config
+// Passport Configuration
 passport.use(new LocalStrategy(User.authenticate()));
+
 passport.serializeUser((user, done) => {
   console.log("✅ Serializing user:", user._id);
   done(null, user._id);
 });
+
 passport.deserializeUser((id, done) => {
   console.log("🔍 Deserializing user by ID:", id);
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -121,7 +130,7 @@ app.post("/register", (req, res, next) => {
 });
 
 app.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", (err, user) => {
     if (err) return next(err);
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
@@ -182,15 +191,15 @@ app.patch("/posts/:id", async (req, res) => {
     if (!post) return res.status(404).json({ error: "Post not found" });
 
     if (post.author !== req.user.name && post.author !== req.user.username) {
-      return res.status(403).json({ error: "Forbidden: You can only edit your own posts." });
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     post.title = req.body.title || post.title;
     post.content = req.body.content || post.content;
     await post.save();
-    res.json({ message: "Post updated successfully", post });
+    res.json({ message: "Post updated", post });
   } catch {
-    res.status(500).json({ error: "Failed to update post" });
+    res.status(500).json({ error: "Update failed" });
   }
 });
 
@@ -204,22 +213,22 @@ app.delete("/posts/:id", async (req, res) => {
     if (!post) return res.status(404).json({ error: "Post not found" });
 
     if (post.author !== req.user.name && post.author !== req.user.username) {
-      return res.status(403).json({ error: "Forbidden: You can only delete your own posts." });
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     await post.deleteOne();
-    res.json({ message: "Post deleted successfully" });
+    res.json({ message: "Post deleted" });
   } catch {
-    res.status(500).json({ error: "Failed to delete post" });
+    res.status(500).json({ error: "Delete failed" });
   }
 });
 
-// Start Server
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 }).on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.error(`❌ Port ${PORT} is already in use.`);
+    console.error(`❌ Port ${PORT} already in use`);
     process.exit(1);
   } else {
     console.error('❌ Server failed to start:', err);

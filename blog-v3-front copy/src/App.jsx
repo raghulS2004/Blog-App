@@ -12,7 +12,8 @@ import axios from 'axios';
 function App() {
     const [user, setUser] = useState('');
     const [loading, setLoading] = useState(true);
-    const baseURL = 'http://localhost:8000';
+    const baseURL = process.env.REACT_APP_API_URL;
+
 
     useEffect(() => {
         axios.get(baseURL + '/current_user', { withCredentials: true })
