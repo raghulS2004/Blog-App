@@ -1,57 +1,73 @@
-# Blog-AppGetting Started with Create React App
-This project was bootstrapped with Create React App.
 
-Available Scripts
-In the project directory, you can run:
+MERN Blog Website
 
-npm start
-Runs the app in the development mode.
-Open http://localhost:3000 to view it in your browser.
+A full-stack blog platform built with the MERN (MongoDB, Express.js, React, Node.js) stack. Users can register, log in, and create, update, or delete blog posts securely using session-based authentication.
 
-The page will reload when you make changes.
-You may also see any lint errors in the console.
+Live Website: [https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app/](https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app/)
 
-npm test
-Launches the test runner in the interactive watch mode.
-See the section about running tests for more information.
+Features:
 
-npm run build
-Builds the app for production to the build folder.
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* User registration and login (with password hashing via Passport.js)
+* Session-based authentication using express-session and connect-mongo
+* Create, edit, and delete your own blog posts
+* Protected routes (only logged-in users can access Compose/Edit/Delete)
+* Responsive UI built with React
+* Secure API with CORS and MongoStore sessions
 
-The build is minified and the filenames include the hashes.
-Your app is ready to be deployed!
+Tech Stack:
+Frontend: React, React Router, Axios, CSS
+Backend: Node.js, Express.js, MongoDB, Mongoose, Passport.js, express-session
+Deployment: Vercel (Frontend), Render (Backend), MongoDB Atlas (Database)
 
-See the section about deployment for more information.
+Project Structure:
+blog-v3/
+├── blog-v3-back/       -> Backend (Express + MongoDB)
+│   ├── index.js
+│   ├── .env
+│   └── package.json
+├── blog-v3-front/      -> Frontend (React)
+│   ├── src/
+│   ├── .env
+│   └── package.json
 
-npm run eject
-Note: this is a one-way operation. Once you eject, you can't go back!
+Environment Variables:
 
-If you aren't satisfied with the build tool and configuration choices, you can eject at any time. This command will remove the single build dependency from your project.
+Backend (.env for Render):
+SESSION\_DB\_URI = your\_mongodb\_connection\_string
+SECRET = your\_session\_secret
+PORT = 8000
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except eject will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Frontend (.env for Vercel):
+REACT\_APP\_API\_URL = [https://your-backend-service.onrender.com](https://your-backend-service.onrender.com)
 
-You don't have to ever use eject. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+How to Run Locally:
 
-Learn More
-You can learn more in the Create React App documentation.
+1. Clone the repository:
+   git clone [https://github.com/raghulS2004/Blog-App.git](https://github.com/raghulS2004/Blog-App.git)
 
-To learn React, check out the React documentation.
+2. Navigate to backend and install dependencies:
+   cd blog-v3/blog-v3-back
+   npm install
 
-Code Splitting
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+3. Create a .env file in blog-v3-back/ with your MongoDB URI and SECRET:
+   SESSION\_DB\_URI=your\_mongo\_uri
+   SECRET=your\_secret
+   PORT=8000
 
-Analyzing the Bundle Size
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+4. Start the backend:
+   npm start
 
-Making a Progressive Web App
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+5. Navigate to frontend and install dependencies:
+   cd ../blog-v3-front
+   npm install
 
-Advanced Configuration
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+6. Create a .env file in blog-v3-front/:
+   REACT\_APP\_API\_URL=[http://localhost:8000](http://localhost:8000)
 
-Deployment
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+7. Start the frontend:
+   npm start
 
-npm run build fails to minify
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Author:
+Raghul S
+GitHub: [https://github.com/raghulS2004](https://github.com/raghulS2004)
+
