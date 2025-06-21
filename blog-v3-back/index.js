@@ -25,9 +25,6 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
-// ✅ Correct CORS for deployed frontend
-const isProduction = process.env.NODE_ENV === 'production';
-
 const allowedOrigins = [
   'http://localhost:3000',
   'https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app',
@@ -46,7 +43,6 @@ app.use(cors({
   credentials: true
 }));
 
-// Add back bodyParser middleware - essential for parsing JSON requests
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -55,9 +51,9 @@ app.use(session({
   resave: true,
   saveUninitialized: false,
   cookie: {
-    secure: true,  // Set to false for localhost development
+    secure: true,
     httpOnly: true,
-    sameSite: 'none',  // Use 'lax' for localhost development
+    sameSite: 'none',
     maxAge: 14 * 24 * 60 * 60 * 1000
   },
   store: MongoStore.create({
@@ -70,7 +66,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Debug middleware to log all requests and cookies
 app.use((req, res, next) => {
   console.log(`🔍 ${req.method} ${req.path}`);
   console.log('🔍 Cookies:', req.headers.cookie);
@@ -103,7 +98,7 @@ userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model("User", userSchema);
 const Text = mongoose.model("Text", textSchema);
 
-// Passport Configuration
+// Passport
 passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser((user, done) => {
@@ -188,7 +183,6 @@ app.post("/login", (req, res, next) => {
 
     req.login(user, (err) => {
       if (err) return next(err);
-      // Save session explicitly
       req.session.save((err) => {
         if (err) return next(err);
         console.log("✅ Login successful - Session ID:", req.sessionID);
@@ -285,7 +279,6 @@ app.delete("/posts/:id", async (req, res) => {
   }
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 }).on('error', (err) => {
