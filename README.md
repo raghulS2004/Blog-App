@@ -2,7 +2,7 @@ MERN Blog Website
 
 A full-stack blog platform built with the MERN (MongoDB, Express.js, React, Node.js) stack. Users can register, log in, and create, update, or delete blog posts securely using session-based authentication.
 
-Live Website: https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app/
+Live Website: https://blog-app-im5z-f5w2j5jyq-raghuls-projects-bf0226ce.vercel.app/
 
 Features:
 
