@@ -9,23 +9,21 @@ const Compose = ({ url, user }) => {
   const [success, setSuccess] = useState('');
   const [debugInfo, setDebugInfo] = useState('');
 
-const API_URL = process.env.REACT_APP_API_URL;
-
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-  
+
     try {
       const response = await axios.post(`${API_URL}/compose`, {
-  title,
-  content
-}, {
-  withCredentials: true
-});
+        title,
+        content
+      }, {
+        withCredentials: true
+      });
 
-      
       if (response.data.message) {
         setSuccess(response.data.message);
         setTitle('');
@@ -33,28 +31,28 @@ const API_URL = process.env.REACT_APP_API_URL;
       }
     } catch (err) {
       console.error('Error creating post:', err);
-      if (err.response && err.response.data && err.response.data.error) {
+      if (err.response?.data?.error) {
         setError(err.response.data.error);
-      } else if (err.response && err.response.status === 401) {
+      } else if (err.response?.status === 401) {
         setError('You are not authorized. Please log in again.');
       } else {
         setError('Failed to create post. Please try again.');
       }
     }
   };
-  
+
   const debugSession = async () => {
     try {
-      const response = await axios.get('/session-debug');
+      const response = await axios.get(`${API_URL}/session-debug`, { withCredentials: true });
       setDebugInfo(JSON.stringify(response.data, null, 2));
     } catch (err) {
       setDebugInfo('Failed to get debug info: ' + err.message);
     }
   };
-  
+
   const testSession = async () => {
     try {
-      const response = await axios.get('/test-session');
+      const response = await axios.get(`${API_URL}/test-session`, { withCredentials: true });
       setDebugInfo('Test Session: ' + JSON.stringify(response.data, null, 2));
     } catch (err) {
       setDebugInfo('Test Session Failed: ' + err.message);
@@ -63,7 +61,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 
   const testPing = async () => {
     try {
-      const response = await axios.get('/ping');
+      const response = await axios.get(`${API_URL}/ping`, { withCredentials: true });
       setDebugInfo('Ping Test: ' + JSON.stringify(response.data, null, 2));
     } catch (err) {
       setDebugInfo('Ping Test Failed: ' + err.message);
