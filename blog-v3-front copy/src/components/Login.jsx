@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../components/css/login.css';
 
@@ -7,8 +7,9 @@ const Login = ({ setUser }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,9 +30,9 @@ const Login = ({ setUser }) => {
       if (response.data.user) {
         console.log('✅ Login successful:', response.data.user.username);
         setUser(response.data.user);
-
-        // ✅ Important: This forces a page reload so session cookie is used
-        window.location.href = '/compose';
+        
+        // ✅ Use React Router navigation instead of window.location.href
+        navigate('/compose');
       } else {
         console.log('❌ No user data returned');
         setError('Login failed - no user data received');

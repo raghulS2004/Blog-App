@@ -1,31 +1,37 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../components/css/login.css';
 
-const Register = ({ url, setUser }) => {
+const Register = ({ setUser }) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const API_URL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
       console.log('🔍 Attempting registration for user:', username);
-      const response = await axios.post('/register', {
+      const response = await axios.post(`${API_URL}/register`, {
         name,
         username,
         mobile,
         password
+      }, {
+        withCredentials: true
       });
       
       console.log('🔍 Registration response:', response.data);
       if (response.data.user) {
         console.log('✅ Registration successful, setting user:', response.data.user.username);
         setUser(response.data.user);
+        navigate('/compose');
       } else {
         console.log('❌ No user in registration response');
         setError('Registration failed - no user data received');

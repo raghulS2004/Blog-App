@@ -27,8 +27,12 @@ mongoose.connect(MONGO_URI)
 
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:5173',
   'https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app',
-  'https://blog-app-im5z.vercel.app'
+  'https://blog-app-im5z.vercel.app',
+  'https://blog-v3-front-copy.vercel.app',
+  'https://blog-v3-front-copy-git-main-raghuls-projects-bf0226ce.vercel.app'
 ];
 
 app.use(cors({
@@ -51,9 +55,9 @@ app.use(session({
   resave: true,
   saveUninitialized: false,
   cookie: {
-    secure: true,
+    secure: process.env.NODE_ENV === 'production', // Only secure in production
     httpOnly: true,
-    sameSite: 'none',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 14 * 24 * 60 * 60 * 1000
   },
   store: MongoStore.create({

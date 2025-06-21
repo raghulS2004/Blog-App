@@ -9,7 +9,7 @@ const Compose = ({ url, user }) => {
   const [success, setSuccess] = useState('');
   const [debugInfo, setDebugInfo] = useState('');
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();

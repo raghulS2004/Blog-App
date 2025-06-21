@@ -6,8 +6,11 @@ import axios from "axios";
 function Navbar({ url, user, setUser }) {
     const [isNavOpen, setIsNavOpen] = useState(false);
     const navigate = useNavigate();
+    
+    const API_URL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
+    
     function handleLogout() {
-        axios.get('/logout')
+        axios.get(`${API_URL}/logout`, { withCredentials: true })
             .then(response => {
                 alert("Logged out successfully");
                 setUser(null);

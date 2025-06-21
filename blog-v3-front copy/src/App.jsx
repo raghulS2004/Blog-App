@@ -22,7 +22,7 @@ function App() {
         const checkAuth = async () => {
             try {
                 console.log('🔍 Checking authentication...');
-                const response = await axios.get('/current_user');
+                const response = await axios.get(`${baseURL}/current_user`, { withCredentials: true });
                 console.log('🔍 Auth response:', response.data);
                 if (response.data.user) {
                     console.log('✅ User authenticated:', response.data.user.username);
@@ -54,8 +54,8 @@ function App() {
                     <Route path='/' element={<Home url={baseURL} user={user} />} />
                     <Route path='/about' element={<About />} />
                     <Route path='/contact' element={<Contact />} />
-                    <Route path='/login' element={user ? <Navigate to="/" /> : <Login url={baseURL} user={user} setUser={setUser} />} />
-                    <Route path='/register' element={user ? <Navigate to="/" /> : <Register url={baseURL} user={user} setUser={setUser} />} />
+                    <Route path='/login' element={user ? <Navigate to="/compose" /> : <Login setUser={setUser} />} />
+                    <Route path='/register' element={user ? <Navigate to="/compose" /> : <Register setUser={setUser} />} />
                     <Route path='/compose' element={user ? <Compose user={user} url={baseURL} /> : <Navigate to="/login" />} />
                 </Routes>
             </div>
