@@ -9,6 +9,8 @@ const Compose = ({ url, user }) => {
   const [success, setSuccess] = useState('');
   const [debugInfo, setDebugInfo] = useState('');
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,11 +18,11 @@ const Compose = ({ url, user }) => {
     setSuccess('');
   
     try {
-      const response = await axios.post('/compose', {
+      const response = await axios.post(`${API_URL}/compose`, {
   title,
   content
 }, {
-  withCredentials: true   // ✅ This is necessary for cookies/session
+  withCredentials: true
 });
 
       
