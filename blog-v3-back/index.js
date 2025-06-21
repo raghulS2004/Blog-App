@@ -55,7 +55,7 @@ app.use(session({
   resave: true,
   saveUninitialized: false,
   cookie: {
-    secure: false,  // Set to false for localhost development
+    secure: true,  // Set to false for localhost development
     httpOnly: true,
     sameSite: 'lax',  // Use 'lax' for localhost development
     maxAge: 14 * 24 * 60 * 60 * 1000
