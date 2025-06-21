@@ -8,14 +8,18 @@ const Login = ({ url, setUser }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
       console.log('🔍 Attempting login for user:', username);
-      const response = await axios.post('/login', {
+      const response = await axios.post(`${API_URL}/login`, {
         username,
         password
+      }, {
+        withCredentials: true
       });
       
       console.log('🔍 Login response:', response.data);
