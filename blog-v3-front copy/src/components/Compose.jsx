@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../api';
 import '../components/css/compose.css';
 
-const Compose = ({ url, user }) => {
+const Compose = ({ user }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [debugInfo, setDebugInfo] = useState('');
-
-  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,11 +15,9 @@ const Compose = ({ url, user }) => {
     setSuccess('');
 
     try {
-      const response = await axios.post(`${API_URL}/compose`, {
+      const response = await axios.post('/compose', {
         title,
         content
-      }, {
-        withCredentials: true
       });
 
       if (response.data.message) {
@@ -43,7 +39,7 @@ const Compose = ({ url, user }) => {
 
   const debugSession = async () => {
     try {
-      const response = await axios.get(`${API_URL}/session-debug`, { withCredentials: true });
+      const response = await axios.get('/session-debug');
       setDebugInfo(JSON.stringify(response.data, null, 2));
     } catch (err) {
       setDebugInfo('Failed to get debug info: ' + err.message);
@@ -52,7 +48,7 @@ const Compose = ({ url, user }) => {
 
   const testSession = async () => {
     try {
-      const response = await axios.get(`${API_URL}/test-session`, { withCredentials: true });
+      const response = await axios.get('/test-session');
       setDebugInfo('Test Session: ' + JSON.stringify(response.data, null, 2));
     } catch (err) {
       setDebugInfo('Test Session Failed: ' + err.message);
@@ -61,7 +57,7 @@ const Compose = ({ url, user }) => {
 
   const testPing = async () => {
     try {
-      const response = await axios.get(`${API_URL}/ping`, { withCredentials: true });
+      const response = await axios.get('/ping');
       setDebugInfo('Ping Test: ' + JSON.stringify(response.data, null, 2));
     } catch (err) {
       setDebugInfo('Ping Test Failed: ' + err.message);

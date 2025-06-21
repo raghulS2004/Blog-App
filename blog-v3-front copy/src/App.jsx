@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar'
 import Home from "./components/Home";
 import About from './components/About'
@@ -7,12 +7,8 @@ import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Compose from './components/Compose';
-import axios from 'axios';
-
-// Configure axios defaults
-const baseURL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
-axios.defaults.baseURL = baseURL;
-axios.defaults.withCredentials = true;
+import axios from './api';
+import './global.css';
 
 function App() {
     const [user, setUser] = useState(null);
@@ -20,8 +16,8 @@ function App() {
 
     useEffect(() => {
         const checkAuth = async () => {
+            console.log('🔍 Checking authentication...');
             try {
-                console.log('🔍 Checking authentication...');
                 const response = await axios.get('/current_user');
                 console.log('🔍 Auth response:', response.data);
                 if (response.data.user) {
@@ -47,19 +43,19 @@ function App() {
     }
 
     return (
-        <Router>
+        <BrowserRouter>
             <div>
-                <Navbar user={user} url={baseURL} setUser={setUser} />
+                <Navbar user={user} url={API_URL} setUser={setUser} />
                 <Routes>
-                    <Route path='/' element={<Home url={baseURL} user={user} />} />
+                    <Route path='/' element={<Home url={API_URL} user={user} />} />
                     <Route path='/about' element={<About />} />
                     <Route path='/contact' element={<Contact />} />
-                    <Route path='/login' element={user ? <Navigate to="/" /> : <Login url={baseURL} user={user} setUser={setUser} />} />
-                    <Route path='/register' element={user ? <Navigate to="/" /> : <Register url={baseURL} user={user} setUser={setUser} />} />
-                    <Route path='/compose' element={user ? <Compose user={user} url={baseURL} /> : <Navigate to="/login" />} />
+                    <Route path='/login' element={!user ? <Login url={API_URL} setUser={setUser} /> : <Navigate to="/compose" />} />
+                    <Route path='/register' element={!user ? <Register url={API_URL} setUser={setUser} /> : <Navigate to="/compose" />} />
+                    <Route path='/compose' element={user ? <Compose user={user} url={API_URL} /> : <Navigate to="/login" />} />
                 </Routes>
             </div>
-        </Router>
+        </BrowserRouter>
     )
 }
 

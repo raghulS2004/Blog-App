@@ -1,25 +1,21 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../api';
 import '../components/css/login.css';
 
-const Login = ({ url, setUser }) => {
+const Login = ({ setUser }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
-  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
       console.log('🔍 Attempting login for user:', username);
-      const response = await axios.post(`${API_URL}/login`, {
+      const response = await axios.post('/login', {
         username,
         password
-      }, {
-        withCredentials: true
       });
       
       console.log('🔍 Login response:', response.data);
