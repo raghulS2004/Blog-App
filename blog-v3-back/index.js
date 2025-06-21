@@ -26,30 +26,39 @@ mongoose.connect(MONGO_URI)
   });
 
 // ✅ Correct CORS for deployed frontend
+const isProduction = process.env.NODE_ENV === 'production';
+
 const allowedOrigins = [
   'http://localhost:3000',
   'https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app'
 ];
-
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('❌ Not allowed by CORS: ' + origin));
+      console.log("❌ Blocked CORS origin:", origin);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true
 }));
 
+// Add back bodyParser middleware - essential for parsing JSON requests
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(session({
   secret: process.env.SECRET || 'defaultsecret',
-  resave: false,
+  resave: true,
   saveUninitialized: false,
+  cookie: {
+    secure: false,  // Set to false for localhost development
+    httpOnly: true,
+    sameSite: 'lax',  // Use 'lax' for localhost development
+    maxAge: 14 * 24 * 60 * 60 * 1000
+  },
   store: MongoStore.create({
     mongoUrl: MONGO_URI,
     collectionName: 'sessions',
@@ -59,6 +68,15 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Debug middleware to log all requests and cookies
+app.use((req, res, next) => {
+  console.log(`🔍 ${req.method} ${req.path}`);
+  console.log('🔍 Cookies:', req.headers.cookie);
+  console.log('🔍 Session ID:', req.sessionID);
+  console.log('🔍 Is authenticated:', req.isAuthenticated());
+  next();
+});
 
 // Schemas
 const userSchema = new mongoose.Schema({
@@ -99,13 +117,46 @@ passport.deserializeUser((id, done) => {
     return done(null, false);
   }
   User.findById(id)
-    .then(user => done(null, user))
-    .catch(err => done(err));
+    .then(user => {
+      if (!user) {
+        console.log("❌ User not found during deserialization:", id);
+        return done(null, false);
+      }
+      console.log("✅ User deserialized successfully:", user.username);
+      done(null, user);
+    })
+    .catch(err => {
+      console.error("❌ Error during deserialization:", err);
+      done(err);
+    });
 });
 
 // Routes
 app.get("/session-debug", (req, res) => {
-  res.json(req.session);
+  res.json({
+    session: req.session,
+    isAuthenticated: req.isAuthenticated(),
+    user: req.user,
+    sessionID: req.sessionID
+  });
+});
+
+app.get("/test-session", (req, res) => {
+  res.json({
+    message: "Session test",
+    sessionID: req.sessionID,
+    isAuthenticated: req.isAuthenticated(),
+    user: req.user,
+    cookies: req.headers.cookie
+  });
+});
+
+app.get("/ping", (req, res) => {
+  res.json({ 
+    message: "Server is running",
+    timestamp: new Date().toISOString(),
+    sessionID: req.sessionID
+  });
 });
 
 app.get("/current_user", (req, res) => {
@@ -136,12 +187,11 @@ app.post("/login", (req, res, next) => {
 
     req.login(user, (err) => {
       if (err) return next(err);
-      req.session.regenerate((err) => {
+      // Save session explicitly
+      req.session.save((err) => {
         if (err) return next(err);
-        req.session.save((err) => {
-          if (err) return next(err);
-          res.status(200).json({ user });
-        });
+        console.log("✅ Login successful - Session ID:", req.sessionID);
+        res.status(200).json({ user });
       });
     });
   })(req, res, next);
@@ -164,7 +214,12 @@ app.get("/posts", (req, res) => {
 });
 
 app.post("/compose", (req, res) => {
+  console.log("🔍 Compose request - Session ID:", req.sessionID);
+  console.log("🔍 Is authenticated:", req.isAuthenticated());
+  console.log("🔍 User:", req.user);
+  
   if (!req.isAuthenticated()) {
+    console.log("❌ User not authenticated for compose request");
     return res.status(401).json({ error: "Unauthorized" });
   }
 
@@ -177,8 +232,14 @@ app.post("/compose", (req, res) => {
   });
 
   newPost.save()
-    .then(() => res.status(200).send("Text Saved Successfully"))
-    .catch(() => res.status(500).send("Failed to save text"));
+    .then(() => {
+      console.log("✅ Post saved successfully by user:", req.user.username);
+      res.status(200).json({ message: "Text Saved Successfully" });
+    })
+    .catch((err) => {
+      console.error("❌ Error saving post:", err);
+      res.status(500).json({ error: "Failed to save text" });
+    });
 });
 
 app.patch("/posts/:id", async (req, res) => {

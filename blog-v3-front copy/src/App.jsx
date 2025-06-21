@@ -9,23 +9,38 @@ import Register from "./components/Register";
 import Compose from './components/Compose';
 import axios from 'axios';
 
-function App() {
-    const [user, setUser] = useState('');
-    const [loading, setLoading] = useState(true);
-    const baseURL = process.env.REACT_APP_API_URL;
+// Configure axios defaults
+const baseURL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
+axios.defaults.baseURL = baseURL;
+axios.defaults.withCredentials = true;
 
+function App() {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get(baseURL + '/current_user', { withCredentials: true })
-            .then(response => {
-                setUser(response.data.user);
-                console.log(user);
-                
-                setLoading(false); 
-            })
-            .catch(() => setLoading(false)); 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[]); 
+        const checkAuth = async () => {
+            try {
+                console.log('🔍 Checking authentication...');
+                const response = await axios.get('/current_user');
+                console.log('🔍 Auth response:', response.data);
+                if (response.data.user) {
+                    console.log('✅ User authenticated:', response.data.user.username);
+                    setUser(response.data.user);
+                } else {
+                    console.log('❌ No user in response');
+                    setUser(null);
+                }
+            } catch (error) {
+                console.error('❌ Auth check failed:', error.response?.data || error.message);
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkAuth();
+    }, []);
 
     if (loading) {
         return <div className="spinner-load">Loading...</div>;

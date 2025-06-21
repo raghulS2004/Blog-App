@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import '../components/css/login.css';
 
 const Register = ({ url, setUser }) => {
@@ -12,20 +14,29 @@ const Register = ({ url, setUser }) => {
     e.preventDefault();
     setError('');
     try {
-      const response = await fetch(url + '/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ name, username, mobile, password })
+      console.log('🔍 Attempting registration for user:', username);
+      const response = await axios.post('/register', {
+        name,
+        username,
+        mobile,
+        password
       });
-      const data = await response.json();
-      if (response.ok) {
-        setUser(data.user);
+      
+      console.log('🔍 Registration response:', response.data);
+      if (response.data.user) {
+        console.log('✅ Registration successful, setting user:', response.data.user.username);
+        setUser(response.data.user);
       } else {
-        setError(data.error || 'Registration failed');
+        console.log('❌ No user in registration response');
+        setError('Registration failed - no user data received');
       }
     } catch (err) {
-      setError('Registration failed');
+      console.error('❌ Registration error:', err.response?.data || err.message);
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Registration failed');
+      }
     }
   };
 
@@ -80,7 +91,7 @@ const Register = ({ url, setUser }) => {
           {error && <div className="error-message" style={{ marginTop: 8 }}>{error}</div>}
         </form>
         <div className="lowerprompt" style={{ marginTop: 24 }}>
-          Already have an account? <a href="/login">Login</a>
+          Already have an account? <Link to="/login">Login</Link>
         </div>
       </div>
     </div>

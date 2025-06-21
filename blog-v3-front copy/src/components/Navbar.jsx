@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './css/navbar.css';
 import axios from "axios";
 
@@ -7,7 +7,7 @@ function Navbar({ url, user, setUser }) {
     const [isNavOpen, setIsNavOpen] = useState(false);
     const navigate = useNavigate();
     function handleLogout() {
-        axios.get(url + '/logout', { withCredentials: true })
+        axios.get('/logout')
             .then(response => {
                 alert("Logged out successfully");
                 setUser(null);
@@ -34,10 +34,10 @@ function Navbar({ url, user, setUser }) {
                 <div></div>
             </div>
             <div className={`navbar-links ${isNavOpen ? 'active' : ''}`}>
-                <a href="/" className="nav-element">Home</a>
-                <a href="/about" className="nav-element">About</a>
-                <a href="/contact" className="nav-element">Contact</a>
-                <a href="/compose" className="nav-element">Compose</a>
+                <Link to="/" className="nav-element">Home</Link>
+                <Link to="/about" className="nav-element">About</Link>
+                <Link to="/contact" className="nav-element">Contact</Link>
+                <Link to="/compose" className="nav-element">Compose</Link>
                 {user ? (
                     <div className="navbar-username">
                         <img src="/default-profile.jpg" alt="Profile" className="profile-pic" />
@@ -46,8 +46,8 @@ function Navbar({ url, user, setUser }) {
                     </div>
                 ) : (
                     <div className="login">
-                        <a href="/login" className="nav-element">Login</a>
-                        <a href="/register" className="nav-element">Register</a>
+                        <Link to="/login" className="nav-element">Login</Link>
+                        <Link to="/register" className="nav-element">Register</Link>
                     </div>
                 )}
             </div>

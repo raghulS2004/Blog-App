@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import '../components/css/compose.css';
 
 const Compose = ({ url, user }) => {
@@ -6,37 +7,72 @@ const Compose = ({ url, user }) => {
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [debugInfo, setDebugInfo] = useState('');
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+  
     try {
-      // Replace with your actual compose API endpoint
-      const response = await fetch(url + '/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ title, content, author: user?.name || user?.username })
+      const response = await axios.post('/compose', {
+        title,
+        content
       });
-      const data = await response.json();
-      if (response.ok) {
-        setSuccess('Post created!');
+      
+      
+  
+      if (response.data.message) {
+        setSuccess(response.data.message);
         setTitle('');
         setContent('');
-      } else {
-        setError(data.error || 'Failed to create post');
       }
     } catch (err) {
-      setError('Failed to create post');
+      console.error('Error creating post:', err);
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else if (err.response && err.response.status === 401) {
+        setError('You are not authorized. Please log in again.');
+      } else {
+        setError('Failed to create post. Please try again.');
+      }
+    }
+  };
+  
+  const debugSession = async () => {
+    try {
+      const response = await axios.get('/session-debug');
+      setDebugInfo(JSON.stringify(response.data, null, 2));
+    } catch (err) {
+      setDebugInfo('Failed to get debug info: ' + err.message);
+    }
+  };
+  
+  const testSession = async () => {
+    try {
+      const response = await axios.get('/test-session');
+      setDebugInfo('Test Session: ' + JSON.stringify(response.data, null, 2));
+    } catch (err) {
+      setDebugInfo('Test Session Failed: ' + err.message);
+    }
+  };
+
+  const testPing = async () => {
+    try {
+      const response = await axios.get('/ping');
+      setDebugInfo('Ping Test: ' + JSON.stringify(response.data, null, 2));
+    } catch (err) {
+      setDebugInfo('Ping Test Failed: ' + err.message);
     }
   };
 
   return (
-    <div className="base-container" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <form className="compose-form" onSubmit={handleSubmit} style={{ width: '100%', maxWidth: 520, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.2rem', background: '#fff', borderRadius: 18, boxShadow: '0 4px 24px rgba(67,104,80,0.10), 0 1.5px 4px rgba(146,26,64,0.04)', padding: '2.5rem 2rem 2rem 2rem' }}>
-        <h2 style={{ color: '#921A40', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem', letterSpacing: '1px' }}>Compose New Post</h2>
-        <label htmlFor="compose-title" style={{ fontWeight: 600, color: '#921A40', marginBottom: 4 }}>Title</label>
+    <div className="base-container">
+      <form className="compose-form" onSubmit={handleSubmit}>
+        <h2>Compose New Post</h2>
+
+        <label htmlFor="compose-title">Title</label>
         <input
           id="compose-title"
           type="text"
@@ -44,23 +80,23 @@ const Compose = ({ url, user }) => {
           value={title}
           onChange={e => setTitle(e.target.value)}
           required
-          style={{ marginBottom: 12 }}
         />
-        <label htmlFor="compose-content" style={{ fontWeight: 600, color: '#921A40', marginBottom: 4 }}>Content</label>
+
+        <label htmlFor="compose-content">Content</label>
         <textarea
           id="compose-content"
           placeholder="Write your post here..."
           value={content}
           onChange={e => setContent(e.target.value)}
           required
-          style={{ marginBottom: 12, minHeight: 120 }}
         />
-        <button type="submit" style={{ margin: '1.2rem auto 0 auto', width: '60%' }}>Post</button>
-        {error && <div className="alert" style={{ marginTop: 8 }}>{error}</div>}
-        {success && <div className="alert-success" style={{ marginTop: 8 }}>{success}</div>}
+
+        <button type="submit">Post</button>
+        {error && <div className="alert">{error}</div>}
+        {success && <div className="alert-success">{success}</div>}
       </form>
     </div>
   );
 };
 
-export default Compose; 
+export default Compose;

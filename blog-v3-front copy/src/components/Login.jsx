@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import '../components/css/login.css';
 
 const Login = ({ url, setUser }) => {
@@ -10,21 +12,27 @@ const Login = ({ url, setUser }) => {
     e.preventDefault();
     setError('');
     try {
-      // Replace with your actual login API endpoint
-      const response = await fetch(url + '/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ username, password })
+      console.log('🔍 Attempting login for user:', username);
+      const response = await axios.post('/login', {
+        username,
+        password
       });
-      const data = await response.json();
-      if (response.ok) {
-        setUser(data.user);
+      
+      console.log('🔍 Login response:', response.data);
+      if (response.data.user) {
+        console.log('✅ Login successful, setting user:', response.data.user.username);
+        setUser(response.data.user);
       } else {
-        setError(data.error || 'Login failed');
+        console.log('❌ No user in login response');
+        setError('Login failed - no user data received');
       }
     } catch (err) {
-      setError('Login failed');
+      console.error('❌ Login error:', err.response?.data || err.message);
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Login failed');
+      }
     }
   };
 
@@ -57,7 +65,7 @@ const Login = ({ url, setUser }) => {
           {error && <div className="error-message" style={{ marginTop: 8 }}>{error}</div>}
         </form>
         <div className="lowerprompt" style={{ marginTop: 24 }}>
-          Don't have an account? <a href="/register">Register</a>
+          Don't have an account? <Link to="/register">Register</Link>
         </div>
       </div>
     </div>
