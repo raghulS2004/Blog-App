@@ -31,7 +31,7 @@ const Register = ({ setUser }) => {
       if (response.data.user) {
         console.log('✅ Registration successful, setting user:', response.data.user.username);
         setUser(response.data.user);
-        window.location.href = '/compose';
+        navigate('/compose');
       } else {
         console.log('❌ No user in registration response');
         setError('Registration failed - no user data received');

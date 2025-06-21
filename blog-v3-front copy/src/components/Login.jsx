@@ -31,8 +31,8 @@ const Login = ({ setUser }) => {
         console.log('✅ Login successful:', response.data.user.username);
         setUser(response.data.user);
         
-        // ✅ Important: This forces a page reload so session cookie is used
-        window.location.href = '/compose';
+        // ✅ Use React Router navigation instead of window.location.href
+        navigate('/compose');
       } else {
         console.log('❌ No user data returned');
         setError('Login failed - no user data received');
