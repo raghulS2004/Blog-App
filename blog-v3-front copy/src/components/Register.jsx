@@ -11,7 +11,7 @@ const Register = ({ setUser }) => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();

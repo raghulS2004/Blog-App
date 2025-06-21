@@ -7,7 +7,7 @@ function Navbar({ url, user, setUser }) {
     const [isNavOpen, setIsNavOpen] = useState(false);
     const navigate = useNavigate();
     
-    const API_URL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
     
     function handleLogout() {
         axios.get(`${API_URL}/logout`, { withCredentials: true })

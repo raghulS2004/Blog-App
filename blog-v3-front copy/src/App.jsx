@@ -10,7 +10,7 @@ import Compose from './components/Compose';
 import axios from 'axios';
 
 // Configure axios defaults
-const baseURL = process.env.REACT_APP_API_URL || 'https://blog-app-drgj.onrender.com';
+const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 axios.defaults.baseURL = baseURL;
 axios.defaults.withCredentials = true;
 
