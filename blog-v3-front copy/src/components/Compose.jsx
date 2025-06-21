@@ -17,12 +17,13 @@ const Compose = ({ url, user }) => {
   
     try {
       const response = await axios.post('/compose', {
-        title,
-        content
-      });
+  title,
+  content
+}, {
+  withCredentials: true   // ✅ This is necessary for cookies/session
+});
+
       
-      
-  
       if (response.data.message) {
         setSuccess(response.data.message);
         setTitle('');
