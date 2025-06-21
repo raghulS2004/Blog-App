@@ -25,6 +25,7 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
+// ✅ Add your actual deployed frontend URLs here
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
@@ -35,6 +36,7 @@ const allowedOrigins = [
   'https://blog-v3-front-copy-git-main-raghuls-projects-bf0226ce.vercel.app'
 ];
 
+// CORS Configuration
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -55,7 +57,7 @@ app.use(session({
   resave: true,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Only secure in production
+    secure: process.env.NODE_ENV === 'production', // ✅ Secure only in production
     httpOnly: true,
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 14 * 24 * 60 * 60 * 1000
@@ -70,6 +72,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Debug log
 app.use((req, res, next) => {
   console.log(`🔍 ${req.method} ${req.path}`);
   console.log('🔍 Cookies:', req.headers.cookie);
@@ -98,11 +101,10 @@ const textSchema = new mongoose.Schema({
 });
 
 userSchema.plugin(passportLocalMongoose);
-
 const User = mongoose.model("User", userSchema);
 const Text = mongoose.model("Text", textSchema);
 
-// Passport
+// Passport Config
 passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser((user, done) => {
@@ -141,18 +143,8 @@ app.get("/session-debug", (req, res) => {
   });
 });
 
-app.get("/test-session", (req, res) => {
-  res.json({
-    message: "Session test",
-    sessionID: req.sessionID,
-    isAuthenticated: req.isAuthenticated(),
-    user: req.user,
-    cookies: req.headers.cookie
-  });
-});
-
 app.get("/ping", (req, res) => {
-  res.json({ 
+  res.json({
     message: "Server is running",
     timestamp: new Date().toISOString(),
     sessionID: req.sessionID
@@ -216,7 +208,7 @@ app.post("/compose", (req, res) => {
   console.log("🔍 Compose request - Session ID:", req.sessionID);
   console.log("🔍 Is authenticated:", req.isAuthenticated());
   console.log("🔍 User:", req.user);
-  
+
   if (!req.isAuthenticated()) {
     console.log("❌ User not authenticated for compose request");
     return res.status(401).json({ error: "Unauthorized" });
