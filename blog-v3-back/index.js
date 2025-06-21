@@ -27,21 +27,28 @@ mongoose.connect(MONGO_URI)
 // CORS setup
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:3001',
   'http://localhost:5173',
-  'https://blog-app-im5z.vercel.app',
+  'https://blog-app-im5z.vercel.app', // Your main deployed frontend
 ];
+
+// Allow all *.vercel.app subdomains of your project
+const dynamicVercelPattern = /^https:\/\/blog-app-im5z.*\.vercel\.app$/;
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    console.log("🌐 CORS origin trying to access:", origin);
+    if (!origin || allowedOrigins.includes(origin) || dynamicVercelPattern.test(origin)) {
       callback(null, true);
     } else {
-      console.log("❌ Blocked CORS origin:", origin);
-      callback(new Error('Not allowed by CORS'));
+      console.log("❌ CORS blocked:", origin);
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true
 }));
+
+
 
 // Trust proxy (important for cookies on Render)
 app.set('trust proxy', 1);
