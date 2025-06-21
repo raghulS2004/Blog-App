@@ -30,7 +30,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app'
+  'https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app',
+  'https://blog-app-im5z.vercel.app'
 ];
 
 app.use(cors({
