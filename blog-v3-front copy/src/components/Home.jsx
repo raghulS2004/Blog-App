@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "../api";
+import axios from "axios";
 import './css/home.css';
 
-function Home({ user }) {
+function Home({ url, user }) {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingPost, setEditingPost] = useState(null);
@@ -11,7 +11,7 @@ function Home({ user }) {
 
     useEffect(() => {
         function fetchPosts() {
-            axios.get('/posts')
+            axios.get(url + '/posts', { withCredentials: true })
                 .then(response => {
                     setPosts(response.data)
                 })
@@ -21,11 +21,11 @@ function Home({ user }) {
             setLoading(false);
         }, 1000);
         return () => clearTimeout(timer);
-    }, []);
+    }, [url]);
 
     function handleDelete(postId) {
         if (!window.confirm("Are you sure you want to delete this post?")) return;
-        axios.delete(`/posts/${postId}`)
+        axios.delete(url + `/posts/${postId}`, { withCredentials: true })
             .then(() => {
                 setPosts(posts.filter(post => post._id !== postId));
             })
@@ -47,10 +47,10 @@ function Home({ user }) {
     }
 
     function handleEditSave(postId) {
-        axios.patch(`/posts/${postId}`, {
+        axios.patch(url + `/posts/${postId}`, {
             title: editTitle,
             content: editContent
-        })
+        }, { withCredentials: true })
             .then(res => {
                 setPosts(posts.map(post => post._id === postId ? res.data.post : post));
                 cancelEdit();

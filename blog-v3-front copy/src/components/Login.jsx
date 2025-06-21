@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from '../api';
+import axios from 'axios';
 import '../components/css/login.css';
 
-const Login = ({ setUser }) => {
+const Login = ({ url, setUser }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -13,15 +13,23 @@ const Login = ({ setUser }) => {
     setError('');
     try {
       console.log('🔍 Attempting login for user:', username);
-      const response = await axios.post('/login', {
+      const API_URL = process.env.REACT_APP_API_URL;
+
+      const response = await axios.post(`${API_URL}/login`, {
         username,
         password
+      }, {
+        withCredentials: true   // ✅ Required for sending cookies
       });
-      
+
       console.log('🔍 Login response:', response.data);
+
       if (response.data.user) {
         console.log('✅ Login successful, setting user:', response.data.user.username);
         setUser(response.data.user);
+        
+        // ✅ Force full reload to allow session cookies to be used
+        window.location.href = '/compose';
       } else {
         console.log('❌ No user in login response');
         setError('Login failed - no user data received');
@@ -72,4 +80,4 @@ const Login = ({ setUser }) => {
   );
 };
 
-export default Login; 
+export default Login;
