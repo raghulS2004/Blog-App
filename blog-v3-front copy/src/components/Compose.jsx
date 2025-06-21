@@ -7,9 +7,6 @@ const Compose = ({ url, user }) => {
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [debugInfo, setDebugInfo] = useState('');
-
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,11 +14,11 @@ const Compose = ({ url, user }) => {
     setSuccess('');
 
     try {
-      const response = await axios.post(`${API_URL}/compose`, {
+      const response = await axios.post(`${url}/compose`, {
         title,
         content
       }, {
-        withCredentials: true
+        withCredentials: true // 🔐 Send session cookie
       });
 
       if (response.data.message) {
@@ -38,33 +35,6 @@ const Compose = ({ url, user }) => {
       } else {
         setError('Failed to create post. Please try again.');
       }
-    }
-  };
-
-  const debugSession = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/session-debug`, { withCredentials: true });
-      setDebugInfo(JSON.stringify(response.data, null, 2));
-    } catch (err) {
-      setDebugInfo('Failed to get debug info: ' + err.message);
-    }
-  };
-
-  const testSession = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/test-session`, { withCredentials: true });
-      setDebugInfo('Test Session: ' + JSON.stringify(response.data, null, 2));
-    } catch (err) {
-      setDebugInfo('Test Session Failed: ' + err.message);
-    }
-  };
-
-  const testPing = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/ping`, { withCredentials: true });
-      setDebugInfo('Ping Test: ' + JSON.stringify(response.data, null, 2));
-    } catch (err) {
-      setDebugInfo('Ping Test Failed: ' + err.message);
     }
   };
 

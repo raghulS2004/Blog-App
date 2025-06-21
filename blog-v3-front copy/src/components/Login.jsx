@@ -18,28 +18,27 @@ const Login = ({ setUser }) => {
     try {
       console.log('🔍 Attempting login for user:', username);
 
-      const response = await axios.post(`${API_URL}/login`, {
-        username,
-        password
-      }, {
-        withCredentials: true  // 🔒 Needed to send session cookie
-      });
+      const response = await axios.post(
+        `${API_URL}/login`,
+        { username, password },
+        { withCredentials: true } // ⚠️ Required for session cookies to persist
+      );
 
       console.log('🔍 Login response:', response.data);
 
       if (response.data.user) {
         console.log('✅ Login successful:', response.data.user.username);
         setUser(response.data.user);
-        
-        // ✅ Use React Router navigation instead of window.location.href
-        navigate('/compose');
+
+        // ✅ Wait for cookie/session to be established
+        setTimeout(() => navigate('/compose'), 200);
       } else {
         console.log('❌ No user data returned');
-        setError('Login failed - no user data received');
+        setError('Login failed: No user data received.');
       }
     } catch (err) {
       console.error('❌ Login error:', err.response?.data || err.message);
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.response?.data?.error || 'Login failed. Please try again.');
     }
   };
 
@@ -53,7 +52,7 @@ const Login = ({ setUser }) => {
             id="login-username"
             type="text"
             value={username}
-            onChange={e => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
           <label htmlFor="login-password">Password</label>
@@ -61,14 +60,14 @@ const Login = ({ setUser }) => {
             id="login-password"
             type="password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
           <button type="submit">Login</button>
           {error && <div className="error-message">{error}</div>}
         </form>
         <div className="lowerprompt">
-          Don't have an account? <Link to="/register">Register</Link>
+          Don’t have an account? <Link to="/register">Register</Link>
         </div>
       </div>
     </div>

@@ -14,29 +14,23 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.SESSION_DB_URI;
-
-console.log("🔌 Connecting to DB:", MONGO_URI);
+const isLocalhost = process.env.NODE_ENV !== 'production';
 
 // Connect to MongoDB
 mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB connection successful"))
-  .catch((err) => {
-    console.error("❌ MongoDB connection failed:", err.message);
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => {
+    console.error("❌ MongoDB connection error:", err);
     process.exit(1);
   });
 
-// ✅ Add your actual deployed frontend URLs here
+// CORS setup
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://localhost:3001',
   'http://localhost:5173',
-  'https://blog-app-im5z-h4vh2s3yn-raghuls-projects-bf0226ce.vercel.app',
   'https://blog-app-im5z.vercel.app',
-  'https://blog-v3-front-copy.vercel.app',
-  'https://blog-v3-front-copy-git-main-raghuls-projects-bf0226ce.vercel.app'
 ];
 
-// CORS Configuration
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -49,17 +43,24 @@ app.use(cors({
   credentials: true
 }));
 
+// Trust proxy (important for cookies on Render)
+app.set('trust proxy', 1);
+
+// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.json()); // important for JSON parsing
 
+// Session setup
 app.use(session({
   secret: process.env.SECRET || 'defaultsecret',
   resave: true,
   saveUninitialized: false,
+  proxy: true,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // ✅ Secure only in production
+    secure: !isLocalhost,
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: !isLocalhost ? 'none' : 'lax',
     maxAge: 14 * 24 * 60 * 60 * 1000
   },
   store: MongoStore.create({
@@ -69,17 +70,9 @@ app.use(session({
   })
 }));
 
+// Passport setup
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Debug log
-app.use((req, res, next) => {
-  console.log(`🔍 ${req.method} ${req.path}`);
-  console.log('🔍 Cookies:', req.headers.cookie);
-  console.log('🔍 Session ID:', req.sessionID);
-  console.log('🔍 Is authenticated:', req.isAuthenticated());
-  next();
-});
 
 // Schemas
 const userSchema = new mongoose.Schema({
@@ -88,6 +81,7 @@ const userSchema = new mongoose.Schema({
   password: String,
   mobile: Number
 });
+userSchema.plugin(passportLocalMongoose);
 
 const textSchema = new mongoose.Schema({
   title: String,
@@ -100,59 +94,39 @@ const textSchema = new mongoose.Schema({
   }
 });
 
-userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model("User", userSchema);
 const Text = mongoose.model("Text", textSchema);
 
-// Passport Config
+// Passport strategies
 passport.use(new LocalStrategy(User.authenticate()));
-
-passport.serializeUser((user, done) => {
-  console.log("✅ Serializing user:", user._id);
-  done(null, user._id);
+passport.serializeUser((user, done) => done(null, user._id));
+passport.deserializeUser((id, done) => {
+  User.findById(id)
+    .then(user => done(null, user || false))
+    .catch(err => done(err));
 });
 
-passport.deserializeUser((id, done) => {
-  console.log("🔍 Deserializing user by ID:", id);
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    console.error("❌ Invalid ObjectId during deserialization:", id);
-    return done(null, false);
-  }
-  User.findById(id)
-    .then(user => {
-      if (!user) {
-        console.log("❌ User not found during deserialization:", id);
-        return done(null, false);
-      }
-      console.log("✅ User deserialized successfully:", user.username);
-      done(null, user);
-    })
-    .catch(err => {
-      console.error("❌ Error during deserialization:", err);
-      done(err);
-    });
+// Debug logger
+app.use((req, res, next) => {
+  console.log(`🔍 ${req.method} ${req.path}`);
+  console.log('🔍 Session ID:', req.sessionID);
+  console.log('🔍 Authenticated:', req.isAuthenticated());
+  console.log('🔍 Cookies:', req.headers.cookie);
+  next();
 });
 
 // Routes
+app.get("/current_user", (req, res) => {
+  res.json({ user: req.isAuthenticated() ? req.user : null });
+});
+
 app.get("/session-debug", (req, res) => {
   res.json({
-    session: req.session,
     isAuthenticated: req.isAuthenticated(),
+    session: req.session,
     user: req.user,
     sessionID: req.sessionID
   });
-});
-
-app.get("/ping", (req, res) => {
-  res.json({
-    message: "Server is running",
-    timestamp: new Date().toISOString(),
-    sessionID: req.sessionID
-  });
-});
-
-app.get("/current_user", (req, res) => {
-  res.json({ user: req.isAuthenticated() ? req.user : null });
 });
 
 app.post("/register", (req, res, next) => {
@@ -160,10 +134,7 @@ app.post("/register", (req, res, next) => {
   const newUser = new User({ name, username, mobile });
 
   User.register(newUser, password, (err, user) => {
-    if (err) {
-      console.log("❌ Registration error:", err);
-      return res.status(500).json({ error: err.message });
-    }
+    if (err) return res.status(500).json({ error: err.message });
 
     req.login(user, (err) => {
       if (err) return next(err);
@@ -205,12 +176,8 @@ app.get("/posts", (req, res) => {
 });
 
 app.post("/compose", (req, res) => {
-  console.log("🔍 Compose request - Session ID:", req.sessionID);
-  console.log("🔍 Is authenticated:", req.isAuthenticated());
-  console.log("🔍 User:", req.user);
-
   if (!req.isAuthenticated()) {
-    console.log("❌ User not authenticated for compose request");
+    console.log("❌ Unauthorized compose attempt");
     return res.status(401).json({ error: "Unauthorized" });
   }
 
@@ -224,19 +191,17 @@ app.post("/compose", (req, res) => {
 
   newPost.save()
     .then(() => {
-      console.log("✅ Post saved successfully by user:", req.user.username);
-      res.status(200).json({ message: "Text Saved Successfully" });
+      console.log("✅ Post saved successfully by:", req.user.username);
+      res.status(200).json({ message: "Post saved successfully" });
     })
-    .catch((err) => {
+    .catch(err => {
       console.error("❌ Error saving post:", err);
-      res.status(500).json({ error: "Failed to save text" });
+      res.status(500).json({ error: "Failed to save post" });
     });
 });
 
 app.patch("/posts/:id", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  if (!req.isAuthenticated()) return res.status(401).json({ error: "Unauthorized" });
 
   try {
     const post = await Text.findById(req.params.id);
@@ -256,9 +221,7 @@ app.patch("/posts/:id", async (req, res) => {
 });
 
 app.delete("/posts/:id", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  if (!req.isAuthenticated()) return res.status(401).json({ error: "Unauthorized" });
 
   try {
     const post = await Text.findById(req.params.id);
@@ -275,6 +238,7 @@ app.delete("/posts/:id", async (req, res) => {
   }
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 }).on('error', (err) => {
