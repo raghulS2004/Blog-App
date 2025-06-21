@@ -7,6 +7,7 @@ import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Compose from './components/Compose';
+import ProtectedRoute from './components/ProtectedRoute';
 import axios from 'axios';
 
 // Configure axios defaults
@@ -56,7 +57,11 @@ function App() {
                     <Route path='/contact' element={<Contact />} />
                     <Route path='/login' element={user ? <Navigate to="/compose" /> : <Login setUser={setUser} />} />
                     <Route path='/register' element={user ? <Navigate to="/compose" /> : <Register setUser={setUser} />} />
-                    <Route path='/compose' element={user ? <Compose user={user} url={baseURL} /> : <Navigate to="/login" />} />
+                    <Route path='/compose' element={
+                        <ProtectedRoute user={user} setUser={setUser}>
+                            <Compose user={user} url={baseURL} />
+                        </ProtectedRoute>
+                    } />
                 </Routes>
             </div>
         </Router>
